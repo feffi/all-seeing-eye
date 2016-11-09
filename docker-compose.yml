@@ -1,16 +1,24 @@
 version: '2'
 services:
-#  graf-db:
-#    tty: true
-#    image: alpine:latest
-#    stdin_open: true
+  graf-db:
+    build: graf-db/
+    image: graf-db:5
+    tty: true
+    command:
+      - cat
+    links:
+      - influxdb
+    volumes:
+      - /var/lib/grafana/
 #  prometheus-rancher-exporter:
+  #build: prometheus-rancher-exporter/
 #    labels:
 #      io.rancher.container.pull_image: always
 #    tty: true
 #    image: alpine:latest
 #    stdin_open: true
 #  grafana:
+  #build: grafana/
 #    labels:
 #      io.rancher.container.pull_image: always
 #    tty: true
@@ -21,39 +29,49 @@ services:
 #    - influxdb:influxdb
 #    stdin_open: true
 #  influxdb:
+  #build: influxdb/
 #    labels:
 #      io.rancher.container.pull_image: always
 #    tty: true
 #    image: alpine:latest
 #    links:
-#    - graf-db:graf-db
+#    - graf-db
 #    stdin_open: true
-#  kibana:
-#    labels:
-#      io.rancher.container.pull_image: always
-#    tty: true
-#    image: alpine:latest
-#    links:
-#    - influxdb:influxdb
-#    - elasticsearch:elasticsearch
-#    - prometheus:prometheus
-#    stdin_open: true
+  kibana:
+    build: kibana/
+    image: kibana:5
+    ports:
+      - 5601:5601/tcp
+    links:
+      - elasticsearch
+      - influxdb
+      - prometheus
+    volumes:
+      - ./kibana/config/:/opt/kibana/config/
 #  alertmanager:
+  #build: alertmanager/
 #    tty: true
 #    image: alpine:latest
 #    links:
 #    - prometheus:prometheus
 #    stdin_open: true
   logstash:
-    labels:
-      io.rancher.container.pull_image: always
-    tty: true
-    image: alpine:latest
-    #links:
-      #- elasticsearch:elasticsearch
-      #- influxdb:influxdb
+    build: logstash/
+    image: logstash:5
+    ports:
+      - 5000:5000/tcp
+    command:
+      - -f
+      - /etc/logstash/conf.d/
+    volumes:
+      - ./logstash/config:/etc/logstash/conf.d
+    links:
+      - elasticsearch
+      #- influxdb
     stdin_open: true
+    tty: true
 #  prometheus:
+  #build: prometheus/
 #    tty: true
 #    image: alpine:latest
 #    links:
@@ -64,41 +82,49 @@ services:
 #    stdin_open: true
 
   logspout:
-    image: gliderlabs/logspout:latest
+    build: logspout/
+    image: logspout:5
     tty: true
     stdin_open: true
     domainname: lab
     environment:
       EXCLUDE_LABEL: logspout.exclude
-      ROUTE_URIS: 'logstash://logstash:5000'
+      ROUTE_URIS: 'tcp://logstash:5000'
     links:
       - logstash
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       io.rancher.scheduler.global: 'true'
-      io.rancher.os.after: wait-for-network
       io.rancher.container.hostname_override: container_name
-      io.rancher.container.dns: 'true'
       logspout.exclude: true
 
 #  pushgateway:
+  #build: pushgateway/
 #    tty: true
 #    image: alpine:latest
 #    links:
 #    - prometheus:prometheus
 #    stdin_open: true
 #  cAdvisor:
+  #build: cAdvisor/
 #    labels:
 #      io.rancher.container.pull_image: always
 #    tty: true
 #    image: alpine:latest
 #    stdin_open: true
-#  elasticsearch:
-#    tty: true
-#    image: alpine:latest
-#    stdin_open: true
+  elasticsearch:
+    build: elasticsearch/
+    image: elasticsearch:5
+    environment:
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    volumes:
+    - ./elasticsearch/config:/etc/elasticsearch
+
+
+
 #  node-exporter:
+#    build: node-exporter/
 #    labels:
 #      io.rancher.container.pull_image: always
 #    tty: true
