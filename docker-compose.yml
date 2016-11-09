@@ -1,0 +1,92 @@
+version: '2'
+services:
+  graf-db:
+    tty: true
+    image: alpine:latest
+    stdin_open: true
+  prometheus-rancher-exporter:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    stdin_open: true
+  grafana:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    links:
+    - elasticsearch:elasticsearch
+    - prometheus:prometheus
+    - influxdb:influxdb
+    stdin_open: true
+  influxdb:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    links:
+    - graf-db:graf-db
+    stdin_open: true
+  kibana:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    links:
+    - influxdb:influxdb
+    - elasticsearch:elasticsearch
+    - prometheus:prometheus
+    stdin_open: true
+  alertmanager:
+    tty: true
+    image: alpine:latest
+    links:
+    - prometheus:prometheus
+    stdin_open: true
+  logstash:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    links:
+    - elasticsearch:elasticsearch
+    - influxdb:influxdb
+    stdin_open: true
+  prometheus:
+    tty: true
+    image: alpine:latest
+    links:
+    - node-exporter:node-exporter
+    - cAdvisor:cAdvisor
+    - logstash:logstash
+    - prometheus-rancher-exporter:prometheus-rancher-exporter
+    stdin_open: true
+  logspout:
+    tty: true
+    image: alpine:latest
+    links:
+    - logstash:logstash
+    stdin_open: true
+  pushgateway:
+    tty: true
+    image: alpine:latest
+    links:
+    - prometheus:prometheus
+    stdin_open: true
+  cAdvisor:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    stdin_open: true
+  elasticsearch:
+    tty: true
+    image: alpine:latest
+    stdin_open: true
+  node-exporter:
+    labels:
+      io.rancher.container.pull_image: always
+    tty: true
+    image: alpine:latest
+    stdin_open: true
