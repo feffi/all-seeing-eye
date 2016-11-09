@@ -1,0 +1,1 @@
+![Stub](/images/stub.png)
