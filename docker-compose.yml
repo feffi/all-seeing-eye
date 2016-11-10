@@ -1,15 +1,5 @@
 version: '2'
 services:
-  graf-db:
-    build: graf-db/
-    image: graf-db:5
-    tty: true
-    command:
-      - cat
-    links:
-      - influxdb
-    volumes:
-      - /var/lib/grafana/
 #  prometheus-rancher-exporter:
   #build: prometheus-rancher-exporter/
 #    labels:
@@ -17,29 +7,47 @@ services:
 #    tty: true
 #    image: alpine:latest
 #    stdin_open: true
-#  grafana:
-  #build: grafana/
-#    labels:
-#      io.rancher.container.pull_image: always
-#    tty: true
-#    image: alpine:latest
-#    links:
-#    - elasticsearch:elasticsearch
-#    - prometheus:prometheus
-#    - influxdb:influxdb
-#    stdin_open: true
-#  influxdb:
-  #build: influxdb/
-#    labels:
-#      io.rancher.container.pull_image: always
-#    tty: true
-#    image: alpine:latest
-#    links:
-#    - graf-db
-#    stdin_open: true
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000/tcp
+    environment:
+      GF_SERVER_ROOT_URL: http://grafana.lab:3000
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel,digiapulssi-breadcrumb-panel,jdbranham-diagram-panel,savantly-heatmap-panel,mtanda-heatmap-epoch-panel,mtanda-histogram-panel
+    labels:
+      io.rancher.sidekicks: grafana-config
+    links:
+      - influxdb
+    volumes_from:
+      - grafana-config
+
+  grafana-config:
+    build: grafana-config/
+    image: grafana-config:latest
+    command:
+      - cat
+    links:
+      - influxdb
+      - elasticsearch
+      - prometheus
+    volumes:
+      - /var/lib/grafana/
+
+  influxdb:
+    image: tutum/influxdb:latest
+#    ports:
+#      - 2003:2003/tcp
+#      - 8083:8083/tcp
+#      - 8086:8086/tcp
+#      - 8090:8090/tcp
+    environment:
+      GRAPHITE_BINDING: :2003
+      GRAPHITE_DB: rancher
+      PRE_CREATE_DB: grafana;prometheus;rancher
+
   kibana:
     build: kibana/
-    image: kibana:5
+    image: kibana:latest
     ports:
       - 5601:5601/tcp
     links:
@@ -48,6 +56,7 @@ services:
       - prometheus
     volumes:
       - ./kibana/config/:/opt/kibana/config/
+
 #  alertmanager:
   #build: alertmanager/
 #    tty: true
@@ -55,9 +64,10 @@ services:
 #    links:
 #    - prometheus:prometheus
 #    stdin_open: true
+
   logstash:
     build: logstash/
-    image: logstash:5
+    image: logstash:latest
     ports:
       - 5000:5000/tcp
     command:
@@ -70,20 +80,38 @@ services:
       #- influxdb
     stdin_open: true
     tty: true
-#  prometheus:
-  #build: prometheus/
-#    tty: true
-#    image: alpine:latest
-#    links:
-#    - node-exporter:node-exporter
-#    - cAdvisor:cAdvisor
-#    - logstash:logstash
-#    - prometheus-rancher-exporter:prometheus-rancher-exporter
-#    stdin_open: true
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090/tcp
+    labels:
+      io.rancher.sidekicks: prometheus-config
+    command:
+      - -alertmanager.url=http://alertmanager:9093
+      - -config.file=/etc/prometheus-config/prometheus.yml
+      - -storage.local.path=/prometheus
+      - -web.console.libraries=/etc/prometheus/console_libraries
+      - -web.console.templates=/etc/prometheus/consoles
+    links:
+      #- node-exporter
+      #- cAdvisor
+      - logstash
+      #- prometheus-rancher-exporter
+    volumes_from:
+      - prometheus-config
+
+  prometheus-config:
+    build: prometheus-config/
+    image: prometheus-config:latest
+    #links:
+    #  - node-exporter
+    volumes:
+      - /etc/prometheus-config/
 
   logspout:
     build: logspout/
-    image: logspout:5
+    image: logspout:latest
     tty: true
     stdin_open: true
     domainname: lab
@@ -97,7 +125,7 @@ services:
     labels:
       io.rancher.scheduler.global: 'true'
       io.rancher.container.hostname_override: container_name
-      logspout.exclude: true
+      logspout.exclude: 'true'
 
 #  pushgateway:
   #build: pushgateway/
@@ -106,6 +134,7 @@ services:
 #    links:
 #    - prometheus:prometheus
 #    stdin_open: true
+
 #  cAdvisor:
   #build: cAdvisor/
 #    labels:
@@ -113,15 +142,14 @@ services:
 #    tty: true
 #    image: alpine:latest
 #    stdin_open: true
+
   elasticsearch:
     build: elasticsearch/
-    image: elasticsearch:5
+    image: elasticsearch:latest
     environment:
       ES_JAVA_OPTS: -Xms1g -Xmx1g
     volumes:
     - ./elasticsearch/config:/etc/elasticsearch
-
-
 
 #  node-exporter:
 #    build: node-exporter/
