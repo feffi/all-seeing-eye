@@ -74,6 +74,8 @@ services:
   logstash:
     build: logstash/
     image: logstash:latest
+    labels:
+      io.rancher.sidekicks: logstash-config
     ports:
       - 5000:5000/tcp
     command:
@@ -154,6 +156,8 @@ services:
   elasticsearch:
     build: elasticsearch/
     image: elasticsearch:latest
+    labels:
+      io.rancher.sidekicks: elasticsearch-config
     environment:
       ES_JAVA_OPTS: -Xms1g -Xmx1g
     volumes_from:
