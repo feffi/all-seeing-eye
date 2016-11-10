@@ -36,6 +36,7 @@ services:
     image: prom/prometheus:latest
     links:
     - logstash:logstash
+    - rancher-exporter
     volumes_from:
     - prometheus-config
     stdin_open: true
@@ -162,3 +163,11 @@ services:
       io.rancher.scheduler.global: 'true'
     image: prom/node-exporter:latest
     stdin_open: true
+  rancher-exporter:
+    labels:
+      io.rancher.container.create_agent: 'true'
+      io.rancher.container.agent.role: environment
+    stdin_open: true
+    image: infinityworks/prometheus-rancher-exporter:latest
+    links:
+      - influxdb
