@@ -18,6 +18,8 @@ services:
       io.rancher.sidekicks: grafana-config
     links:
       - influxdb
+      - elasticsearch
+      - prometheus
     volumes_from:
       - grafana-config
 
@@ -26,10 +28,6 @@ services:
     image: grafana-config:latest
     command:
       - cat
-    links:
-      - influxdb
-      - elasticsearch
-      - prometheus
     volumes:
       - /var/lib/grafana/
 
@@ -48,14 +46,22 @@ services:
   kibana:
     build: kibana/
     image: kibana:latest
+    labels:
+      io.rancher.sidekicks: kibana-config
     ports:
       - 5601:5601/tcp
     links:
       - elasticsearch
       - influxdb
       - prometheus
+    volumes_from:
+      - kibana-config
+
+  kibana-config:
+    build: kibana-config/
+    image: kibana-config:latest
     volumes:
-      - ./kibana/config/:/opt/kibana/config/
+      - /opt/kibana/config/
 
 #  alertmanager:
   #build: alertmanager/
@@ -73,13 +79,17 @@ services:
     command:
       - -f
       - /etc/logstash/conf.d/
-    volumes:
-      - ./logstash/config:/etc/logstash/conf.d
     links:
       - elasticsearch
-      #- influxdb
-    stdin_open: true
-    tty: true
+      - influxdb
+    volumes_from:
+      - logstash-config
+
+  logstash-config:
+    build: logstash-config/
+    image: logstash-config:latest
+    volumes:
+      - /etc/logstash/conf.d
 
   prometheus:
     image: prom/prometheus:latest
@@ -104,8 +114,6 @@ services:
   prometheus-config:
     build: prometheus-config/
     image: prometheus-config:latest
-    #links:
-    #  - node-exporter
     volumes:
       - /etc/prometheus-config/
 
@@ -148,9 +156,14 @@ services:
     image: elasticsearch:latest
     environment:
       ES_JAVA_OPTS: -Xms1g -Xmx1g
-    volumes:
-    - ./elasticsearch/config:/etc/elasticsearch
+    volumes_from:
+      - elasticsearch-config
 
+  elasticsearch-config:
+    build: elasticsearch-config/
+    image: elasticsearch-config:latest
+    volumes:
+      - /etc/elasticsearch
 #  node-exporter:
 #    build: node-exporter/
 #    labels:
