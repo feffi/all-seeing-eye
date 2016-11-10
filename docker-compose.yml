@@ -22,6 +22,7 @@ services:
       - prometheus
     volumes_from:
       - grafana-config
+    stdin_open: true
 
   grafana-config:
     build: grafana-config/
@@ -30,6 +31,7 @@ services:
       - cat
     volumes:
       - /var/lib/grafana/
+    stdin_open: true
 
   influxdb:
     image: tutum/influxdb:latest
@@ -42,6 +44,7 @@ services:
       GRAPHITE_BINDING: :2003
       GRAPHITE_DB: rancher
       PRE_CREATE_DB: grafana;prometheus;rancher
+    stdin_open: true
 
   kibana:
     build: kibana/
@@ -56,12 +59,14 @@ services:
       - prometheus
     volumes_from:
       - kibana-config
+    stdin_open: true
 
   kibana-config:
     build: kibana-config/
     image: kibana-config:latest
     volumes:
       - /opt/kibana/config/
+    stdin_open: true
 
 #  alertmanager:
   #build: alertmanager/
@@ -86,12 +91,14 @@ services:
       - influxdb
     volumes_from:
       - logstash-config
+    stdin_open: true
 
   logstash-config:
     build: logstash-config/
     image: logstash-config:latest
     volumes:
       - /etc/logstash/conf.d
+    stdin_open: true
 
   prometheus:
     image: prom/prometheus:latest
@@ -112,12 +119,14 @@ services:
       #- prometheus-rancher-exporter
     volumes_from:
       - prometheus-config
+    stdin_open: true
 
   prometheus-config:
     build: prometheus-config/
     image: prometheus-config:latest
     volumes:
       - /etc/prometheus-config/
+    stdin_open: true
 
   logspout:
     build: logspout/
@@ -162,12 +171,14 @@ services:
       ES_JAVA_OPTS: -Xms1g -Xmx1g
     volumes_from:
       - elasticsearch-config
+    stdin_open: true
 
   elasticsearch-config:
     build: elasticsearch-config/
     image: elasticsearch-config:latest
     volumes:
       - /etc/elasticsearch
+    stdin_open: true
 #  node-exporter:
 #    build: node-exporter/
 #    labels:
