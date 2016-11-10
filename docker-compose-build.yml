@@ -200,6 +200,7 @@ services:
     labels:
       io.rancher.container.create_agent: 'true'
       io.rancher.container.agent.role: environment
+    stdin_open: true
     tty: true
     image: infinityworks/prometheus-rancher-exporter:latest
     links:
