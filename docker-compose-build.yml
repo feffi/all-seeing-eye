@@ -114,7 +114,7 @@ services:
       - -web.console.templates=/etc/prometheus/consoles
     links:
       #- node-exporter
-      #- cAdvisor
+      - cadvisor
       - logstash
       #- prometheus-rancher-exporter
     volumes_from:
@@ -154,13 +154,25 @@ services:
 #    - prometheus:prometheus
 #    stdin_open: true
 
-#  cAdvisor:
-  #build: cAdvisor/
-#    labels:
-#      io.rancher.container.pull_image: always
-#    tty: true
-#    image: alpine:latest
-#    stdin_open: true
+  cadvisor:
+    image: google/cadvisor:latest
+    privileged: true
+    ports:
+      - 9104:9104/tcp
+    network_mode: host
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.container.dns: 'true'
+    stdin_open: true
+    command:
+      - --port=9104
+      - --listen_ip=0.0.0.0
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro
 
   elasticsearch:
     build: elasticsearch/

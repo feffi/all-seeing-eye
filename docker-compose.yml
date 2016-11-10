@@ -1,0 +1,159 @@
+version: '2'
+services:
+  prometheus-config:
+    image: prometheus-config:latest
+    links:
+    - logstash:logstash
+    volumes:
+    - /etc/prometheus-config/
+    stdin_open: true
+  logstash:
+    ports:
+    - 5000:5000/tcp
+    labels:
+      io.rancher.sidekicks: logstash-config
+    command:
+    - -f
+    - /etc/logstash/conf.d/
+    image: logstash:latest
+    links:
+    - influxdb:influxdb
+    - elasticsearch:elasticsearch
+    volumes_from:
+    - logstash-config
+    stdin_open: true
+  prometheus:
+    ports:
+    - 9090:9090/tcp
+    labels:
+      io.rancher.sidekicks: prometheus-config
+    command:
+    - -alertmanager.url=http://alertmanager:9093
+    - -config.file=/etc/prometheus-config/prometheus.yml
+    - -storage.local.path=/prometheus
+    - -web.console.libraries=/etc/prometheus/console_libraries
+    - -web.console.templates=/etc/prometheus/consoles
+    image: prom/prometheus:latest
+    links:
+    - logstash:logstash
+    volumes_from:
+    - prometheus-config
+    stdin_open: true
+  elasticsearch-config:
+    image: elasticsearch-config:latest
+    volumes:
+    - /etc/elasticsearch
+    stdin_open: true
+  kibana-config:
+    image: kibana-config:latest
+    links:
+    - influxdb:influxdb
+    - elasticsearch:elasticsearch
+    - prometheus:prometheus
+    volumes:
+    - /opt/kibana/config/
+    stdin_open: true
+  logspout:
+    environment:
+      EXCLUDE_LABEL: logspout.exclude
+      ROUTE_URIS: logstash://logstash:5000
+    domainname: lab
+    labels:
+      io.rancher.scheduler.global: 'true'
+      logspout.exclude: 'true'
+      io.rancher.container.hostname_override: container_name
+    tty: true
+    image: logspout:latest
+    logging: {}
+    links:
+    - logstash:logstash
+    - 'logstash:'
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    stdin_open: true
+  grafana:
+    ports:
+    - 3000:3000/tcp
+    environment:
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel,digiapulssi-breadcrumb-panel,jdbranham-diagram-panel,savantly-heatmap-panel,mtanda-heatmap-epoch-panel,mtanda-histogram-panel
+      GF_SERVER_ROOT_URL: http://grafana.lab:3000
+    labels:
+      io.rancher.sidekicks: grafana-config
+    image: grafana/grafana:latest
+    links:
+    - elasticsearch:elasticsearch
+    - influxdb:influxdb
+    - prometheus:prometheus
+    volumes_from:
+    - grafana-config
+    stdin_open: true
+  grafana-config:
+    command:
+    - cat
+    image: grafana-config:latest
+    links:
+    - elasticsearch:elasticsearch
+    - influxdb:influxdb
+    - prometheus:prometheus
+    volumes:
+    - /var/lib/grafana/
+    stdin_open: true
+  kibana:
+    ports:
+    - 5601:5601/tcp
+    labels:
+      io.rancher.sidekicks: kibana-config
+    image: kibana:latest
+    links:
+    - influxdb:influxdb
+    - elasticsearch:elasticsearch
+    - prometheus:prometheus
+    volumes_from:
+    - kibana-config
+    stdin_open: true
+  influxdb:
+    environment:
+      GRAPHITE_BINDING: :2003
+      GRAPHITE_DB: rancher
+      PRE_CREATE_DB: grafana;prometheus;rancher
+    image: tutum/influxdb:latest
+    stdin_open: true
+  logstash-config:
+    image: logstash-config:latest
+    links:
+    - influxdb:influxdb
+    - elasticsearch:elasticsearch
+    volumes:
+    - /etc/logstash/conf.d
+    stdin_open: true
+  elasticsearch:
+    ports:
+    - 9200:9200/tcp
+    environment:
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    labels:
+      io.rancher.sidekicks: elasticsearch-config
+    image: elasticsearch:latest
+    logging: {}
+    volumes_from:
+    - elasticsearch-config
+    stdin_open: true
+  cadvisor:
+    image: google/cadvisor:latest
+    privileged: true
+    ports:
+      - 9104:9104/tcp
+    network_mode: host
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.container.dns: 'true'
+    stdin_open: true
+    command:
+      - --port=9104
+      - --listen_ip=0.0.0.0
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro

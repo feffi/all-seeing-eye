@@ -1,28 +1,24 @@
 version: '2'
 services:
-  graf-db:
-    scale: 1
-  prometheus-rancher-exporter:
-    scale: 1
-  grafana:
-    scale: 1
-  influxdb:
-    scale: 1
-  kibana:
-    scale: 1
-  alertmanager:
+  prometheus-config:
     scale: 1
   logstash:
     scale: 1
   prometheus:
     scale: 1
-  logspout:
+  elasticsearch-config:
     scale: 1
-  pushgateway:
+  kibana-config:
     scale: 1
-  cAdvisor:
+  grafana:
+    scale: 1
+  grafana-config:
+    scale: 1
+  kibana:
+    scale: 1
+  influxdb:
+    scale: 1
+  logstash-config:
     scale: 1
   elasticsearch:
-    scale: 1
-  node-exporter:
     scale: 1
