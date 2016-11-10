@@ -2,6 +2,8 @@ version: '2'
 services:
   prometheus-config:
     scale: 1
+  rancher-exporter:
+    scale: 1
   logstash:
     scale: 1
   prometheus:
