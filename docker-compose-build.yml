@@ -191,6 +191,11 @@ services:
     volumes:
       - /etc/elasticsearch
     stdin_open: true
+  node-exporter:
+    labels:
+      io.rancher.scheduler.global: 'true'
+    image: prom/node-exporter:latest
+    stdin_open: true
 #  node-exporter:
 #    build: node-exporter/
 #    labels:

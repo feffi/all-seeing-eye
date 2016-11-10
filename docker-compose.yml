@@ -157,3 +157,8 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /cgroup:/cgroup:ro
+  node-exporter:
+    labels:
+      io.rancher.scheduler.global: 'true'
+    image: prom/node-exporter:latest
+    stdin_open: true
