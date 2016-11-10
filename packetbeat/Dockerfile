@@ -8,4 +8,4 @@ RUN apt-get update \
  && wget https://download.elastic.co/beats/packetbeat/packetbeat-${VERSION}-${ARCH}.${EXTENSION} \
  && tar zxvf packetbeat-${VERSION}-${ARCH}.${EXTENSION}
 WORKDIR packetbeat-${VERSION}
-CMD ["./packetbeat", "-e", "-c=/etc/packetbeat/packetbeat.yml"]
+CMD ["./packetbeat", "-e", "-c=/etc/packetbeat/packetbeat.conf"]
