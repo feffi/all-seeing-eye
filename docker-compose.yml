@@ -136,7 +136,7 @@ services:
     domainname: lab
     environment:
       EXCLUDE_LABEL: logspout.exclude
-      ROUTE_URIS: 'tcp://logstash:5000'
+      ROUTE_URIS: 'logstash://logstash:5000'
     links:
       - logstash
     volumes:
