@@ -1,1 +1,1 @@
-![Stub](/images/stub.png)
+![Stub](/images/all-seeing-eye.png)
