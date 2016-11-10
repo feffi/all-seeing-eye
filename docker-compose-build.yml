@@ -198,17 +198,10 @@ services:
     stdin_open: true
   rancher-exporter:
     labels:
-      io.rancher.container.create_agent: 'true'
+      io.rancher.container.create_agent: true
       io.rancher.container.agent.role: environment
     stdin_open: true
     tty: true
     image: infinityworks/prometheus-rancher-exporter:latest
     links:
       - influxdb
-#  node-exporter:
-#    build: node-exporter/
-#    labels:
-#      io.rancher.container.pull_image: always
-#    tty: true
-#    image: alpine:latest
-#    stdin_open: true
