@@ -61,3 +61,14 @@ services:
     volumes:
       - /opt/kibana/config/
     stdin_open: true
+
+  dockbeat:
+    image: ingensi/dockbeat:latest
+    environment:
+      PERIOD: 5
+      
+    links:
+      - elasticsearch
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
