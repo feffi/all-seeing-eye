@@ -31,7 +31,6 @@ services:
       - /etc/logstash/conf.d/
     links:
       - elasticsearch
-      - influxdb
     volumes_from:
       - logstash-config
     stdin_open: true
@@ -52,8 +51,6 @@ services:
       - 5601:5601/tcp
     links:
       - elasticsearch
-      - influxdb
-      - prometheus
     volumes_from:
       - kibana-config
     stdin_open: true

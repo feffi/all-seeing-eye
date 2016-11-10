@@ -1,26 +1,14 @@
 version: '2'
 services:
-  prometheus-config:
-    scale: 1
-  rancher-exporter:
-    scale: 1
-  logstash:
-    scale: 1
-  prometheus:
+  elasticsearch:
     scale: 1
   elasticsearch-config:
     scale: 1
-  kibana-config:
-    scale: 1
-  grafana:
-    scale: 1
-  grafana-config:
-    scale: 1
-  kibana:
-    scale: 1
-  influxdb:
+  logstash:
     scale: 1
   logstash-config:
     scale: 1
-  elasticsearch:
+  kibana:
+    scale: 1
+  kibana-config:
     scale: 1
