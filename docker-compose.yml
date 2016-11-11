@@ -29,6 +29,7 @@ services:
       io.rancher.sidekicks: logstash-config
     ports:
       - 5000:5000/tcp
+      - 5044:5044/tcp
     command:
       - -f
       - /etc/logstash/conf.d/
