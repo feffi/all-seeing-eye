@@ -1,4 +1,4 @@
 FROM alpine
 RUN mkdir -p /etc/packetbeat/
-ADD packetbeat.conf /etc/packetbeat/packetbeat.conf
+ADD packetbeat.yml /etc/packetbeat/packetbeat.yml
 CMD ["/bin/sh"]
