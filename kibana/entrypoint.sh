@@ -6,5 +6,7 @@ while true; do
     nc -q 1 elasticsearch 9200 2>/dev/null && break
 done
 
+curl -XPUT 'http://elasticsearch:9200/_template/packetbeat' -d@/tmp/packetbeat.template.json
+
 echo "Starting Kibana"
 exec kibana
