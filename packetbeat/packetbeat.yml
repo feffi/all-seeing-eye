@@ -1,0 +1,55 @@
+# Available log levels are: critical, error, warning, info, debug
+#logging.level: debug
+
+#flows:
+#  timeout: 30s
+#  period: 10s
+
+shipper:
+ name:
+
+interfaces:
+  device: any
+
+protocols:
+  icmp:
+    enabled: true
+  amqp:
+    ports: [5672]
+  cassandra:
+    ports: [9042]
+  dns:
+    ports: [53]
+    include_authorities: true
+    include_additionals: true
+  http:
+    ports: [80, 8080, 8000, 5000, 8002]
+  memcache:
+    ports: [11211]
+  mysql:
+    ports: [3306]
+  pgsql:
+    ports: [5432]
+  redis:
+    ports: [6379]
+  thrift:
+    ports: [9090]
+  mongodb:
+    ports: [27017]
+  nfs:
+    ports: [2049]
+
+output:
+#----------------------------- Console output ---------------------------------
+  console:
+    pretty: true
+    enabled: true
+#-------------------------- Elasticsearch output ------------------------------
+  elasticsearch:
+    enabled: true
+    hosts: ["elasticsearch:9200"]
+    save_topology: true
+#----------------------------- Logstash output --------------------------------
+  logstash:
+    enabled: true
+    hosts: ["logstash:5000"]

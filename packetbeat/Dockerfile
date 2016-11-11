@@ -11,14 +11,12 @@
 
 
 FROM phusion/baseimage:latest
-ENV VERSION=1.0.0-beta2
-ENV ARCH=x86_64
-ENV EXTENSION=tar.gz
-
 RUN apt-get update \
- && apt-get -y -q install libpcap0.8 curl \
- && (curl -SL -# https://download.elastic.co/beats/packetbeat/packetbeat-${VERSION}-${ARCH}.${EXTENSION} | tar xz) \
- && chown -R root:root packetbeat-${VERSION}
+ && apt-get -y -q install libpcap0.8 curl nano \
+ && (curl -SL -# https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.0.0-linux-x86_64.tar.gz | tar xz) \
+ && chown -R root:root packetbeat-5.0.0-linux-x86_64 \
+ && mkdir -p /etc/packetbeat
 
-WORKDIR packetbeat-${VERSION}
+ADD packetbeat.yml /etc/packetbeat/packetbeat.yml
+WORKDIR packetbeat-5.0.0-linux-x86_64
 CMD ["./packetbeat", "-e", "-c=/etc/packetbeat/packetbeat.yml"]
