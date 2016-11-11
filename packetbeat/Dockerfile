@@ -21,4 +21,4 @@ RUN apt-get update \
  && chown -R root:root packetbeat-${VERSION}
 
 WORKDIR packetbeat-${VERSION}
-CMD ["./packetbeat", "-e", "-c=/etc/packetbeat/packetbeat.yml"]
+CMD ["./packetbeat", "-e", "-c=/etc/packetbeat/packetbeat.conf"]
