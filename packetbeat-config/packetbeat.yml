@@ -124,7 +124,7 @@ name: packetbeat
 
 #----------------------------- Logstash output --------------------------------
 output.logstash:
-  # The Logstash hosts
+  enabled: false
   hosts: ["logstash:5000"]
 
   # Optional SSL. By default is off.
