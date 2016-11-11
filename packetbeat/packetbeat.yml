@@ -45,10 +45,10 @@ output:
     pretty: true
     enabled: true
 #-------------------------- Elasticsearch output ------------------------------
-  elasticsearch:
-    enabled: true
-    hosts: ["elasticsearch:9200"]
-    save_topology: true
+#  elasticsearch:
+#    enabled: true
+#    hosts: ["elasticsearch:9200"]
+#    save_topology: true
 #----------------------------- Logstash output --------------------------------
   logstash:
     enabled: true
