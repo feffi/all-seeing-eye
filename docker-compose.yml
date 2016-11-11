@@ -69,25 +69,13 @@ services:
     labels:
       io.rancher.container.hostname_override: container_name
       io.rancher.container.dns: 'true'
-    labels:
-      io.rancher.sidekicks: packetbeat-config
-    volumes_from:
-      - packetbeat-config
     stdin_open: true
 
-  packetbeat-config:
-    build: packetbeat-config/
-    image: packetbeat-config:latest
-    volumes:
-      - /etc/packetbeat/
-    stdin_open: true
-
-  dockbeat:
-    image: ingensi/dockbeat:latest
-    environment:
-      PERIOD: 5
-    links:
-      - elasticsearch
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
+#  dockbeat:
+#    image: ingensi/dockbeat:latest
+#    environment:
+#      PERIOD: 5
+#    links:
+#      - elasticsearch
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
