@@ -40,16 +40,16 @@ protocols:
     ports: [2049]
 
 output:
-#----------------------------- Console output ---------------------------------
-  console:
-    pretty: true
+#----------------------------- Logstash output --------------------------------
+  logstash:
     enabled: true
+    hosts: ["logstash:5044"]
+#----------------------------- Console output ---------------------------------
+#  console:
+#    pretty: true
+#    enabled: true
 #-------------------------- Elasticsearch output ------------------------------
 #  elasticsearch:
 #    enabled: true
 #    hosts: ["elasticsearch:9200"]
 #    save_topology: true
-#----------------------------- Logstash output --------------------------------
-  logstash:
-    enabled: true
-    hosts: ["logstash:5044"]
