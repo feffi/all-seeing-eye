@@ -64,13 +64,15 @@ services:
   metricbeat:
     build: metricbeat/
     image: metricbeat:latest
-    network_mode: host
+    #network_mode: host
+    links:
+      - logstash:logstash
     volumes:
       - /proc:/hostfs/proc:ro
       - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
       - /:/hostfs:ro
-    command:
-      - -system.hostfs=/hostfs
+    #command:
+    #  - -system.hostfs=/hostfs
     labels:
       io.rancher.container.hostname_override: container_name
       io.rancher.container.dns: 'true'
