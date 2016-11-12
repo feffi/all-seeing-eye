@@ -61,6 +61,21 @@ services:
       io.rancher.container.dns: 'true'
     stdin_open: true
 
+  metricbeat:
+    build: metricbeat/
+    image: metricbeat:latest
+    network_mode: host
+    volumes:
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+    command:
+      - -system.hostfs=/hostfs
+    labels:
+      io.rancher.container.hostname_override: container_name
+      io.rancher.container.dns: 'true'
+    stdin_open: true
+
 #  dockbeat:
 #    image: ingensi/dockbeat:latest
 #    environment:
