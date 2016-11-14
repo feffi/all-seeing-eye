@@ -2,6 +2,10 @@ metricbeat.modules:
 - module: system
   metricsets:
     - cpu
+    - load
+    - core
+    - diskio
+    - fsstat
     - filesystem
     - memory
     - network
@@ -10,6 +14,3 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
   cpu_ticks: false
-output.logstash:
-  hosts: ["logstash:5044"]
-  index: metricbeat

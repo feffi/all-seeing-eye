@@ -39,11 +39,11 @@ protocols:
   nfs:
     ports: [2049]
 
-output:
+#output:
 #----------------------------- Logstash output --------------------------------
-  logstash:
-    enabled: true
-    hosts: ["logstash:5044"]
+#  logstash:
+#    enabled: true
+#    hosts: ["logstash.monitoring.docker:5044"]
 #----------------------------- Console output ---------------------------------
 #  console:
 #    pretty: true

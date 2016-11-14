@@ -1,10 +1,4 @@
 version: '2'
-# ------ NETWORKS ------------------------
-networks:
-  monitoring:
-    driver: bridge
-
-# ------ CONTAINER -----------------------
 services:
 
   elasticsearch:
@@ -13,13 +7,12 @@ services:
     ports:
       - "9200:9200/tcp"
       - "9300:9300/tcp"
-    networks:
-      - monitoring
     labels:
       io.rancher.container.hostname_override: container_name
     environment:
       ES_JAVA_OPTS: -Xms1g -Xmx1g
     stdin_open: true
+    restart: always
 
   logstash:
     build: logstash/
@@ -28,63 +21,79 @@ services:
       - "5000:5000/tcp"
       - "5000:5000/udp"
       - "5044:5044/tcp"
-    #networks:
-    #  - monitoring
     links:
       - elasticsearch:elasticsearch
+    depends_on:
+      - elasticsearch
     labels:
       io.rancher.container.hostname_override: container_name
     command:
       - -f
       - /etc/logstash/conf.d/
     stdin_open: true
+    restart: always
 
   kibana:
-    build: kibana/
-    image: kibana:latest
+    image: kibana:5
     ports:
       - "5601:5601/tcp"
-    networks:
-      - monitoring
     links:
       - elasticsearch:elasticsearch
+    depends_on:
+      - elasticsearch
+    command:
+      - -e http://elasticsearch:9200
     labels:
       io.rancher.container.hostname_override: container_name
     stdin_open: true
+    restart: always
+
+#  metricbeat:
+#    build: metricbeat/
+#    image: metricbeat:latest
+#    #network_mode: host
+#    links:
+#      - logstash:logstash
+#    depends_on:
+#      - logstash
+#    volumes:
+#      - /proc:/hostfs/proc:ro
+#      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+#      - /:/hostfs:ro
+#    command:
+#      - -e
+#      - -E=output.logstash.hosts=logstash:5044
+#      - -system.hostfs=/hostfs
+#    labels:
+#      io.rancher.container.hostname_override: container_name
+#      io.rancher.container.dns: 'true'
+#    stdin_open: true
+#    restart: always
+
+
 
   packetbeat:
     build: packetbeat/
     image: packetbeat:latest
     network_mode: host
+    depends_on:
+      - logstash
+    command:
+      - -e
+      - -E=output.logstash.hosts=logstash:5044
     labels:
       io.rancher.container.hostname_override: container_name
       io.rancher.container.dns: 'true'
     stdin_open: true
+    restart: always
 
-  metricbeat:
-    build: metricbeat/
-    image: metricbeat:latest
-    #network_mode: host
-    links:
-      - logstash:logstash
-    volumes:
-      - /proc:/hostfs/proc:ro
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-      - /:/hostfs:ro
-    #command:
-    #  - -system.hostfs=/hostfs
-    labels:
-      io.rancher.container.hostname_override: container_name
-      io.rancher.container.dns: 'true'
-    stdin_open: true
 
 #  dockbeat:
 #    image: ingensi/dockbeat:latest
 #    environment:
 #      PERIOD: 5
-#    networks:
-#      - monitoring
 #    links:
 #      - elasticsearch
 #    volumes:
 #      - /var/run/docker.sock:/var/run/docker.sock
+#    restart: always
